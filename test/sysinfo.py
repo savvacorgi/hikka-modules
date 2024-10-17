@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import platform
 from .. import loader
 from hikkatl.types import Message
 
@@ -10,22 +9,20 @@ class ServerStatsMod(loader.Module):
     strings = {"name": "ServerStats"}
 
     async def sysinfocmd(self, message: Message):
-        uname = platform.uname()
-        
-        total_ram = os.popen('cat /proc/meminfo | grep MemTotal').read().strip().split()[1]
-        used_ram = os.popen('cat /proc/meminfo | grep MemAvailable').read().strip().split()[1]
-        total_disk = os.popen('df -h / | awk \'\$1 == "Filesystem" {print $2}\'').read().strip()
-        used_disk = os.popen('df -h / | awk \'\$1 == "Filesystem" {print $3}\'').read().strip()
-        free_disk = os.popen('df -h / | awk \'\$1 == "Filesystem" {print $4}\'').read().strip()
+        total_ram = os.popen('free -m | awk \'/^Mem:/ {print $2}\'').read().strip()
+        used_ram = os.popen('free -m | awk \'/^Mem:/ {print $3}\'').read().strip()
+        free_ram = os.popen('free -m | awk \'/^Mem:/ {print $4}\'').read().strip()
+        cpu_info = os.popen('top -bn1 | grep "Cpu(s)"').read().strip()
+        total_disk = os.popen('df -h / | awk \'/\// {print $2}\'').read().strip()
+        used_disk = os.popen('df -h / | awk \'/\// {print $3}\'').read().strip()
+        free_disk = os.popen('df -h / | awk \'/\// {print $4}\'').read().strip()
 
         info = (
             f"<b>Системная информация:</b>\n"
-            f"OS: {uname.system} {uname.release}\n"
-            f"Архитектура: {uname.machine}\n"
-            f"Процессор: {uname.processor}\n\n"
-            f"<b>Оперативная память:</b>\n"
-            f"Всего RAM: {int(total_ram) / 1024:.2f} МБ\n"
-            f"Использовано RAM: {int(used_ram) / 1024:.2f} МБ\n\n"
+            f"Общая оперативная память: {total_ram} МБ\n"
+            f"Использовано оперативной памяти: {used_ram} МБ\n"
+            f"Свободно оперативной памяти: {free_ram} МБ\n"
+            f"Загрузка CPU: {cpu_info.split(',')[0].split()[1]}%\n\n"
             f"<b>Диск:</b>\n"
             f"Всего: {total_disk}\n"
             f"Использовано: {used_disk}\n"

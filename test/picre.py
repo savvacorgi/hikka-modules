@@ -14,9 +14,8 @@ class RimMod(loader.Module):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 if resp.status == 200:
-                    data = await resp.text()
-                    # Извлечение изображения из HTML (предполагается, что картинка в теге <img>)
-                    img_url = self.extract_image_url(data)
+                    data = await resp.read()  # Чтение как байты
+                    img_url = self.extract_image_url(data.decode('utf-8', errors='ignore'))  # Декодирование с игнорированием ошибок
                     if img_url:
                         await message.reply(img_url)
                     else:

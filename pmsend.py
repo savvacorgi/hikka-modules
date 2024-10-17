@@ -6,11 +6,11 @@ from .. import loader, utils
 
 @loader.tds
 class PMSSenderMod(loader.Module):
-    """Отправка сообщения в ЛС указанному пользователю через команду .pms"""
+    """Отправка сообщения в ЛС указанному пользователю через команду (твой префикс)pms"""
     strings = {"name": "PMSSender"}
 
     async def pmscmd(self, message: Message):
-        """Использование: .pms <username или ответ на сообщение> <текст сообщения>"""
+        """Использование: (преф)pms <username или ответ на сообщение> <текст сообщения>"""
         args = utils.get_args_raw(message)
         
         # Проверка на наличие аргументов
@@ -35,6 +35,6 @@ class PMSSenderMod(loader.Module):
         # Отправка сообщения в ЛС
         try:
             await message.client.send_message(user_id, text)
-            await message.edit("<b>Сообщение отправлено!</b>")
+            await message.delete()  # Удаляем сообщение с командой после отправки
         except Exception as e:
             await message.edit(f"<b>Ошибка отправки: {e}</b>")

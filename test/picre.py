@@ -17,7 +17,7 @@ class RimMod(loader.Module):
                     data = await resp.json()
                     img_url = data.get("file_url")
                     if img_url:
-                        await message.reply_photo(img_url)  # Отправляем изображение
+                        await message.client.send_photo(message.chat.id, img_url)  # Отправляем изображение
                     else:
                         await message.reply("Не удалось найти изображение.")
                 else:

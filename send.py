@@ -1,30 +1,24 @@
 # -*- coding: utf-8 -*-
 
-# Импорты для Hikka
 from hikkatl.types import Message
 from .. import loader, utils
 
 @loader.tds
 class PMSSenderMod(loader.Module):
-    """Отправка сообщения в ЛС указанному пользователю через команду (твой префикс)pms"""
     strings = {"name": "PMSSender"}
 
     async def pmscmd(self, message: Message):
-        """Использование: (преф)pms <username или ответ на сообщение> <текст сообщения>"""
         args = utils.get_args_raw(message)
         
-        # Проверка на наличие аргументов
         if not args:
             await message.edit("<b>Пожалуйста, укажи получателя и сообщение.</b>")
             return
         
-        # Если есть ответ на сообщение, берем ID автора
         reply = await message.get_reply_message()
         if reply:
             user_id = reply.sender_id
             text = args
         else:
-            # Если нет ответа, пытаемся разобрать аргументы
             args = args.split(" ", 1)
             if len(args) < 2:
                 await message.edit("<b>Пожалуйста, укажи получателя и сообщение.</b>")
@@ -32,9 +26,28 @@ class PMSSenderMod(loader.Module):
             user_id = args[0]
             text = args[1]
         
-        # Отправка сообщения в ЛС
         try:
             await message.client.send_message(user_id, text)
-            await message.delete()  # Удаляем сообщение с командой после отправки
+            await message.delete()
+        except Exception as e:
+            await message.edit(f"<b>Ошибка отправки: {e}</b>")
+
+    async def grcmd(self, message: Message):
+        args = utils.get_args_raw(message)
+        
+        if not args:
+            await message.edit("<b>Пожалуйста, укажи группу и сообщение.</b>")
+            return
+
+        args = args.split(" ", 1)
+        if len(args) < 2:
+            await message.edit("<b>Пожалуйста, укажи группу и сообщение.</b>")
+            return
+        group = args[0]
+        text = args[1]
+        
+        try:
+            await message.client.send_message(group, text)
+            await message.delete()
         except Exception as e:
             await message.edit(f"<b>Ошибка отправки: {e}</b>")
